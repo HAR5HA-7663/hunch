@@ -1,0 +1,21 @@
+- heading "Web form" [level=1, ref=e1]
+- textbox "Text input" [ref=e3]: Ada Lovelace
+- textbox "Password" [ref=e4]
+- textbox "Textarea" [ref=e5]
+- textbox "Disabled input" [disabled, ref=e6]
+- textbox "Readonly input" [ref=e7]
+- link "Return to index" [ref=e8]
+- combobox "Dropdown (select)" [expanded=false, ref=e9]: Open this select menu
+  - option "Open this select menu" [selected, ref=e18]
+  - option "One" [ref=e19]
+  - option "Two" [ref=e20]
+  - option "Three" [ref=e21]
+- combobox "Dropdown (datalist)" [ref=e10]
+- button "File input" [ref=e11]: No file chosen
+- checkbox "Checked checkbox" [checked=true, ref=e14]
+- checkbox "Default checkbox" [checked=false, ref=e15]
+- radio "Checked radio" [checked=true, ref=e12]
+- radio "Default radio" [checked=false, ref=e13]
+- button "Submit" [ref=e2]
+- textbox "Date picker" [ref=e16]
+- slider "Example range " [ref=e17]: 5

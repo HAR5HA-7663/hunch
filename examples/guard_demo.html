@@ -1,0 +1,8 @@
+<!doctype html><title>Account settings (guard demo)</title>
+<h1>Account settings</h1>
+<label>Display name <input type="text" value="QA"></label>
+<button>Save changes</button> <button>Export my data</button>
+<h2>Danger zone</h2>
+<button>Delete account</button> <button>Send test SMS to all contacts</button>
+<!-- hunch --url "file://$PWD/examples/guard_demo.html" --dry-run --goal "Delete the account."
+     -> {"status": "escalate", "reason": "risky_click", "target": "button \"Delete account\"", ...} -->

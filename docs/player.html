@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Replays a recorded hunch run next to its step log. Used to produce docs/demo.gif.
+     The stopwatch follows the video clock, so the timing is the real run, not sped up.
+     Expects raw/run.webm and raw/run.json (see record_demo.sh). -->
+<meta charset="utf-8">
+<title>hunch demo</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --fg:#e6edf3; --dim:#8b949e; --ok:#3fb950; --accent:#58a6ff; --warn:#d29922; }
+  * { box-sizing:border-box } html,body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; overflow:hidden }
+  .wrap { display:grid; grid-template-columns: 1fr 470px; gap:14px; padding:14px; height:100vh }
+  .browser { background:#fff; border-radius:10px; overflow:hidden; border:1px solid var(--line); display:flex; flex-direction:column }
+  .bar { background:#21262d; padding:8px 12px; display:flex; gap:7px; align-items:center; border-bottom:1px solid var(--line) }
+  .dot { width:11px; height:11px; border-radius:50%; background:#484f58 }
+  .url { margin-left:10px; color:var(--dim); font-size:12px; background:#0d1117; padding:3px 10px; border-radius:6px; flex:1 }
+  video { width:100%; flex:1; object-fit:cover; object-position:top left; background:#fff }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column }
+  h1 { margin:0; font-size:22px; letter-spacing:.5px } h1 span { color:var(--accent) }
+  .tag { color:var(--dim); font-size:12.5px; margin:2px 0 14px }
+  .clock { font-size:50px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-1px; margin:2px 0 0 }
+  .clock small { font-size:18px; color:var(--dim); font-weight:400; margin-left:4px }
+  .real { color:var(--dim); font-size:11.5px; margin-bottom:14px }
+  .goal { color:var(--dim); font-size:12px; border-left:2px solid var(--line); padding-left:10px; margin-bottom:14px }
+  .goal b { color:var(--fg); font-weight:500 }
+  .log { flex:1 } .row { display:grid; grid-template-columns: 22px 46px 1fr 62px; gap:8px; padding:6px 0; border-bottom:1px dashed var(--line);
+    opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s } .row.on { opacity:1; transform:none }
+  .n { color:var(--dim) } .op { color:var(--accent) } .op.click { color:var(--warn) } .ms { color:var(--ok); text-align:right }
+  .t { white-space:nowrap; overflow:hidden; text-overflow:ellipsis } .t i { color:var(--dim); font-style:normal }
+  .sum { margin-top:12px; padding:10px 12px; border-radius:8px; background:#0f2a17; border:1px solid #1f6f3a; color:var(--ok);
+    opacity:0; transition:opacity .2s; font-size:13px } .sum.on { opacity:1 } .sum b { color:#7ee787 }
+</style>
+<div class="wrap">
+  <div class="browser">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="url">selenium.dev/selenium/web/web-form.html</span></div>
+    <video id="v" src="raw/run.webm" muted playsinline preload="auto"></video>
+  </div>
+  <div class="panel">
+    <h1>hunch<span>.</span></h1>
+    <div class="tag">one Jev decision per browser step</div>
+    <div class="clock"><span id="clock">0.00</span><small>s</small></div>
+    <div class="real">real time · not sped up</div>
+    <div class="goal"><b>goal</b> fill in the name, the password and a comment, then submit the form</div>
+    <div class="log" id="log"></div>
+    <div class="sum" id="sum"></div>
+  </div>
+</div>
+<script>
+const OFFSET = 0.30;   // seconds between the recording starting and hunch starting
+const short = t => (t || "").replace(/^textbox |^button /, "").replace(/"/g, "").replace(" <- ", " ← ");
+fetch("raw/run.json").then(r => r.json()).then(({steps, summary}) => {
+  const log = document.getElementById("log"), v = document.getElementById("v");
+  const rows = steps.map(s => {
+    const el = document.createElement("div"); el.className = "row";
+    const op = s.op === "TYPE_TEXT" ? "TYPE" : s.op;
+    el.innerHTML = `<span class="n">${String(s.step).padStart(2, "0")}</span><span class="op ${op === "CLICK" ? "click" : ""}">${op}</span>` +
+                   `<span class="t">${short(s.target)} <i>conf ${s.op_conf.toFixed(2)}</i></span><span class="ms">${s.jev_ms} ms</span>`;
+    log.appendChild(el); return {el, at: OFFSET + s.t_ms / 1000};
+  });
+  const jevMs = steps.reduce((a, s) => a + s.jev_ms, 0), sum = document.getElementById("sum");
+  sum.innerHTML = `✓ verified in code: page shows “Received!”<br><b>${steps.length} decisions · ${summary.seconds.toFixed(2)} s total · ${jevMs} ms spent thinking</b>`;
+  const clock = document.getElementById("clock"), end = OFFSET + summary.seconds;
+  const tick = () => {
+    const t = v.currentTime;
+    clock.textContent = Math.min(Math.max(t - OFFSET, 0), summary.seconds).toFixed(2);
+    rows.forEach(r => r.el.classList.toggle("on", t >= r.at));
+    sum.classList.toggle("on", t >= end - 0.05 || v.ended);
+    requestAnimationFrame(tick);
+  };
+  tick();
+  setTimeout(() => v.play(), 900);
+});
+</script>

@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hunch-browser"
+dynamic = ["version"]
+description = "Browser agent that acts on a hunch: Jev (TypeSafe System One) picks every click in ~150 ms, an LLM is only needed when confidence drops. Built on agent-browser."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Harsha Vardhan Yellela" }]
+keywords = ["jev", "typesafe", "system-one", "browser-agent", "browser-automation", "agent-browser", "ai-agents", "web-automation", "e2e-testing", "llm"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Internet :: WWW/HTTP :: Browsers",
+  "Topic :: Software Development :: Testing",
+]
+dependencies = []  # standard library only
+
+[project.urls]
+Homepage = "https://github.com/HAR5HA-7663/hunch"
+Issues = "https://github.com/HAR5HA-7663/hunch/issues"
+
+[project.scripts]
+hunch = "hunch.cli:main"
+
+[tool.hatch.version]
+path = "hunch/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hunch"]
