@@ -146,8 +146,13 @@ routine stretch, and take over only when it exits `2`.
 ```
 
 `hunch --dry-run --goal "…"` answers *"what would you click here?"* for the current page without touching it, which makes
-it a cheap second opinion inside an existing agent loop. A ready-made Claude Code skill is in
-[`integrations/claude-code`](integrations/claude-code/SKILL.md).
+it a cheap second opinion inside an existing agent loop.
+
+A ready-made skill teaches Claude Code (or any agent that reads `SKILL.md`) when to reach for hunch and how to act on an escalation:
+
+```bash
+npx skills add HAR5HA-7663/hunch      # installs .claude/skills/hunch/SKILL.md, same mechanism agent-browser uses
+```
 
 As a library:
 
